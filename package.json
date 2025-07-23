@@ -1,12 +1,13 @@
 {
     "name": "iptv-restream",
     "version": "1.0.0",
-    "description": "IPTV restream panel to restream M3U8 links to HTTP",
+    "description": "Painel IPTV para restream de links M3U8 para HTTP",
     "main": "server.js",
     "scripts": {
         "start": "node server.js"
     },
     "dependencies": {
-        "express": "^4.18.2"
+        "express": "^4.18.2",
+        "axios": "^1.6.0"
     }
 }
