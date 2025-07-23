@@ -3,50 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel IPTV Restream</title>
+    <title>IPTV Restream Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 class="text-2xl font-bold mb-6 text-center">Painel IPTV Restream</h1>
         <div class="mb-4">
-            <label for="m3u-content" class="block text-sm font-medium text-gray-700">Conteúdo da Lista M3U</label>
-            <textarea id="m3u-content" class="mt-1 p-2 w-full border rounded-md h-40" placeholder="Cole o conteúdo da lista M3U aqui, ex.: #EXTM3U\n#EXTINF:-1,Channel 1\nhttp://example.com/channel.m3u8"></textarea>
+            <label for="m3u8-link" class="block text-sm font-medium text-gray-700">Link M3U8</label>
+            <input type="text" id="m3u8-link" class="mt-1 p-2 w-full border rounded-md" placeholder="Insira a URL M3U8 (ex.: http://exemplo.com/playlist.m3u8)">
         </div>
-        <button onclick="generateRestreamList()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Gerar Links Restream</button>
+        <button onclick="startRestream()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Iniciar Restream</button>
         <div id="output" class="mt-4 text-sm text-gray-600"></div>
     </div>
 
     <script>
-        async function generateRestreamList() {
-            const m3uContent = document.getElementById('m3u-content').value.trim();
+        async function startRestream() {
+            const m3u8Link = document.getElementById('m3u8-link').value.trim();
             const outputDiv = document.getElementById('output');
 
-            if (!m3uContent) {
-                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira o conteúdo da lista M3U.</p>';
+            if (!m3u8Link || !m3u8Link.match(/\.m3u8$/)) {
+                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira uma URL M3U8 válida terminada em .m3u8</p>';
                 return;
             }
 
             outputDiv.innerHTML = '<p>Carregando...</p>';
 
             try {
-                const response = await fetch('/generate-restream', {
+                const response = await fetch('/start-restream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ m3uContent: m3uContent })
+                    body: JSON.stringify({ m3u8Url: m3u8Link })
                 });
                 const data = await response.json();
 
                 if (response.ok) {
-                    let linksHtml = '<ul class="list-disc pl-5">';
-                    data.streams.forEach(stream => {
-                        linksHtml += `<li><strong>${stream.title}</strong>: <a href="${stream.url}" target="_blank" class="underline">${stream.url}</a></li>`;
-                    });
-                    linksHtml += '</ul>';
                     outputDiv.innerHTML = `
-                        <p class="text-green-500">Links gerados com sucesso!</p>
-                        ${linksHtml}
-                        <p>Copie os links ou use-os em um player como VLC.</p>
+                        <p class="text-green-500">
+                            Restream iniciado! Acesse em: 
+                            <a href="${data.restreamUrl}" target="_blank" class="underline">${data.restreamUrl}</a>
+                        </p>
+                        <p>Teste este link em um player como o VLC.</p>
                     `;
                 } else {
                     outputDiv.innerHTML = `<p class="text-red-500">Erro: ${data.error}</p>`;
