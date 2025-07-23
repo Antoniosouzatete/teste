@@ -10,8 +10,8 @@
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 class="text-2xl font-bold mb-6 text-center">Painel IPTV Restream</h1>
         <div class="mb-4">
-            <label for="m3u-link" class="block text-sm font-medium text-gray-700">Link M3U da Lista</label>
-            <input type="text" id="m3u-link" class="mt-1 p-2 w-full border rounded-md" placeholder="Insira o URL da lista M3U (ex.: http://example.com/lista.m3u ou http://example.com/get.php)">
+            <label for="m3u-content" class="block text-sm font-medium text-gray-700">Conteúdo da Lista M3U</label>
+            <textarea id="m3u-content" class="mt-1 p-2 w-full border rounded-md h-40" placeholder="Cole o conteúdo da lista M3U aqui, ex.: #EXTM3U\n#EXTINF:-1,Channel 1\nhttp://example.com/channel.m3u8"></textarea>
         </div>
         <button onclick="generateRestreamList()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Gerar Lista Restream</button>
         <div id="output" class="mt-4 text-sm text-gray-600"></div>
@@ -19,11 +19,11 @@
 
     <script>
         async function generateRestreamList() {
-            const m3uLink = document.getElementById('m3u-link').value.trim();
+            const m3uContent = document.getElementById('m3u-content').value.trim();
             const outputDiv = document.getElementById('output');
 
-            if (!m3uLink) {
-                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira uma URL M3U válida.</p>';
+            if (!m3uContent) {
+                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira o conteúdo da lista M3U.</p>';
                 return;
             }
 
@@ -33,7 +33,7 @@
                 const response = await fetch('/generate-restream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ m3uUrl: m3uLink })
+                    body: JSON.stringify({ m3uContent: m3uContent })
                 });
                 const data = await response.json();
 
