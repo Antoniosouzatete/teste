@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Restream IPTV</title>
+    <title>IPTV Restream Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
     <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 class="text-2xl font-bold mb-6 text-center">Painel de Restream IPTV</h1>
+        <h1 class="text-2xl font-bold mb-6 text-center">IPTV Restream Panel</h1>
         <div class="mb-4">
-            <label for="m3u8-link" class="block text-sm font-medium text-gray-700">Link M3U8</label>
-            <input type="text" id="m3u8-link" class="mt-1 p-2 w-full border rounded-md" placeholder="Insira a URL M3U8 (ex.: http://example.com/playlist.m3u8)">
+            <label for="m3u8-link" class="block text-sm font-medium text-gray-700">M3U8 Link</label>
+            <input type="text" id="m3u8-link" class="mt-1 p-2 w-full border rounded-md" placeholder="Enter M3U8 URL (e.g., http://example.com/playlist.m3u8)">
         </div>
-        <button onclick="startRestream()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Iniciar Restream</button>
+        <button onclick="startRestream()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Start Restream</button>
         <div id="output" class="mt-4 text-sm text-gray-600"></div>
     </div>
 
@@ -23,11 +23,11 @@
             const outputDiv = document.getElementById('output');
 
             if (!m3u8Link || !m3u8Link.match(/\.m3u8$/)) {
-                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira uma URL M3U8 válida terminada em .m3u8</p>';
+                outputDiv.innerHTML = '<p class="text-red-500">Please enter a valid M3U8 URL ending with .m3u8</p>';
                 return;
             }
 
-            outputDiv.innerHTML = '<p>Carregando...</p>';
+            outputDiv.innerHTML = '<p>Loading...</p>';
 
             try {
                 const response = await fetch('/start-restream', {
@@ -40,16 +40,16 @@
                 if (response.ok) {
                     outputDiv.innerHTML = `
                         <p class="text-green-500">
-                            Restream iniciado! Acesse em: 
+                            Restream started! Access at: 
                             <a href="${data.restreamUrl}" target="_blank" class="underline">${data.restreamUrl}</a>
                         </p>
-                        <p>Teste este link em um player como o VLC.</p>
+                        <p>Test this link in a media player like VLC.</p>
                     `;
                 } else {
-                    outputDiv.innerHTML = `<p class="text-red-500">Erro: ${data.error}</p>`;
+                    outputDiv.innerHTML = `<p class="text-red-500">Error: ${data.error}</p>`;
                 }
             } catch (error) {
-                outputDiv.innerHTML = `<p class="text-red-500">Erro: Falha ao conectar ao servidor. ${error.message}</p>`;
+                outputDiv.innerHTML = `<p class="text-red-500">Error: Failed to connect to server. ${error.message}</p>`;
             }
         }
     </script>
