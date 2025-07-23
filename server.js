@@ -43,17 +43,14 @@ app.post('/generate-restream', (req, res) => {
 
     try {
         const lines = m3uContent.split('\n');
-
-        let newM3uContent = '#EXTM3U\n';
-        const streamIds = new Map();
+        const streams = [];
 
         for (let i = 0; i < lines.length; i++) {
             if (lines[i].startsWith('#EXTINF:')) {
                 const title = lines[i].match(/,(.+)/)[1];
                 const url = lines[i + 1].trim();
-                if (url && (url.match(/\.m3u8|\.ts$/) || url.includes('get.php'))) {
+                if (url && (url.match(/\.m3u8|\.ts$/))) {
                     const streamId = `stream_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-                    streamIds.set(url, streamId);
 
                     const outputFileName = `${streamId}.m3u8`;
                     const outputPath = path.join(streamsDir, outputFileName);
@@ -83,16 +80,16 @@ app.post('/generate-restream', (req, res) => {
                     ffmpegProcesses.set(streamId, ffmpegProcess);
 
                     const restreamUrl = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}/streams/${outputFileName}`;
-                    newM3uContent += `#EXTINF:-1,${title}\n${restreamUrl}\n`;
+                    streams.push({ title, url: restreamUrl });
                 }
             }
         }
 
-        const newM3uPath = path.join(streamsDir, 'restream.m3u');
-        fs.writeFileSync(newM3uPath, newM3uContent);
+        if (streams.length === 0) {
+            return res.status(400).json({ error: 'Nenhum canal válido encontrado no conteúdo M3U.' });
+        }
 
-        const downloadUrl = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}/streams/restream.m3u`;
-        res.json({ m3uUrl: downloadUrl });
+        res.json({ streams });
     } catch (error) {
         res.status(500).json({ error: 'Falha ao processar a lista M3U. Verifique o conteúdo e os logs. Detalhes: ' + error.message });
     }
