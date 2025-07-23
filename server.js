@@ -43,8 +43,14 @@ app.post('/generate-restream', async (req, res) => {
     ffmpegProcesses.forEach((_, id) => cleanupProcess(id));
 
     try {
-        // Baixar a lista M3U
-        const response = await axios.get(m3uUrl);
+        // Configurar solicitação axios com headers
+        const response = await axios.get(m3uUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Referer': 'http://v4.agenciav4.top/'
+            },
+            timeout: 10000 // 10 segundos de timeout
+        });
         const lines = response.data.split('\n');
 
         let newM3uContent = '#EXTM3U\n';
