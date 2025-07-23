@@ -11,7 +11,7 @@
         <h1 class="text-2xl font-bold mb-6 text-center">Painel IPTV Restream</h1>
         <div class="mb-4">
             <label for="m3u-link" class="block text-sm font-medium text-gray-700">Link M3U da Lista</label>
-            <input type="text" id="m3u-link" class="mt-1 p-2 w-full border rounded-md" placeholder="Insira o URL da lista M3U">
+            <input type="text" id="m3u-link" class="mt-1 p-2 w-full border rounded-md" placeholder="Insira o URL da lista M3U (ex.: http://example.com/lista.m3u ou http://example.com/get.php)">
         </div>
         <button onclick="generateRestreamList()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Gerar Lista Restream</button>
         <div id="output" class="mt-4 text-sm text-gray-600"></div>
@@ -22,8 +22,8 @@
             const m3uLink = document.getElementById('m3u-link').value.trim();
             const outputDiv = document.getElementById('output');
 
-            if (!m3uLink || !m3uLink.match(/\.m3u$/)) {
-                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira uma URL M3U válida terminada em .m3u</p>';
+            if (!m3uLink) {
+                outputDiv.innerHTML = '<p class="text-red-500">Por favor, insira uma URL M3U válida.</p>';
                 return;
             }
 
