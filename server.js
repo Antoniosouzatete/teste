@@ -35,8 +35,8 @@ function cleanupProcess(streamId) {
 app.post('/generate-restream', async (req, res) => {
     const { m3uUrl } = req.body;
 
-    if (!m3uUrl || !m3uUrl.match(/\.m3u$/)) {
-        return res.status(400).json({ error: 'URL M3U inválida. Deve terminar com .m3u' });
+    if (!m3uUrl) {
+        return res.status(400).json({ error: 'URL M3U inválida. Por favor, forneça uma URL.' });
     }
 
     // Limpar processos anteriores
@@ -54,7 +54,7 @@ app.post('/generate-restream', async (req, res) => {
             if (lines[i].startsWith('#EXTINF:')) {
                 const title = lines[i].match(/,(.+)/)[1];
                 const url = lines[i + 1].trim();
-                if (url && url.match(/\.m3u8|\.ts$/)) {
+                if (url && (url.match(/\.m3u8|\.ts$/) || url.includes('get.php'))) {
                     const streamId = `stream_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
                     streamIds.set(url, streamId);
 
@@ -97,7 +97,7 @@ app.post('/generate-restream', async (req, res) => {
         const downloadUrl = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}/streams/restream.m3u`;
         res.json({ m3uUrl: downloadUrl });
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao processar a lista M3U. Verifique o URL e os logs.' });
+        res.status(500).json({ error: 'Falha ao processar a lista M3U. Verifique o URL e os logs. Detalhes: ' + error.message });
     }
 });
 
