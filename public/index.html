@@ -13,7 +13,7 @@
             <label for="m3u-content" class="block text-sm font-medium text-gray-700">Conteúdo da Lista M3U</label>
             <textarea id="m3u-content" class="mt-1 p-2 w-full border rounded-md h-40" placeholder="Cole o conteúdo da lista M3U aqui, ex.: #EXTM3U\n#EXTINF:-1,Channel 1\nhttp://example.com/channel.m3u8"></textarea>
         </div>
-        <button onclick="generateRestreamList()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Gerar Lista Restream</button>
+        <button onclick="generateRestreamList()" class="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600">Gerar Links Restream</button>
         <div id="output" class="mt-4 text-sm text-gray-600"></div>
     </div>
 
@@ -38,9 +38,15 @@
                 const data = await response.json();
 
                 if (response.ok) {
+                    let linksHtml = '<ul class="list-disc pl-5">';
+                    data.streams.forEach(stream => {
+                        linksHtml += `<li><strong>${stream.title}</strong>: <a href="${stream.url}" target="_blank" class="underline">${stream.url}</a></li>`;
+                    });
+                    linksHtml += '</ul>';
                     outputDiv.innerHTML = `
-                        <p class="text-green-500">Lista gerada com sucesso! Baixe aqui: <a href="${data.m3uUrl}" download="restream.m3u" class="underline">${data.m3uUrl}</a></p>
-                        <p>Teste os canais com um player como VLC.</p>
+                        <p class="text-green-500">Links gerados com sucesso!</p>
+                        ${linksHtml}
+                        <p>Copie os links ou use-os em um player como VLC.</p>
                     `;
                 } else {
                     outputDiv.innerHTML = `<p class="text-red-500">Erro: ${data.error}</p>`;
