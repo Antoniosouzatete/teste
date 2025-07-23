@@ -2,7 +2,6 @@ const express = require('express');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const axios = require('axios');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -32,26 +31,18 @@ function cleanupProcess(streamId) {
     }
 }
 
-app.post('/generate-restream', async (req, res) => {
-    const { m3uUrl } = req.body;
+app.post('/generate-restream', (req, res) => {
+    const { m3uContent } = req.body;
 
-    if (!m3uUrl) {
-        return res.status(400).json({ error: 'URL M3U inválida. Por favor, forneça uma URL.' });
+    if (!m3uContent) {
+        return res.status(400).json({ error: 'Por favor, forneça o conteúdo da lista M3U.' });
     }
 
     // Limpar processos anteriores
     ffmpegProcesses.forEach((_, id) => cleanupProcess(id));
 
     try {
-        // Configurar solicitação axios com headers
-        const response = await axios.get(m3uUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Referer': 'http://v4.agenciav4.top/'
-            },
-            timeout: 10000 // 10 segundos de timeout
-        });
-        const lines = response.data.split('\n');
+        const lines = m3uContent.split('\n');
 
         let newM3uContent = '#EXTM3U\n';
         const streamIds = new Map();
@@ -103,7 +94,7 @@ app.post('/generate-restream', async (req, res) => {
         const downloadUrl = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}/streams/restream.m3u`;
         res.json({ m3uUrl: downloadUrl });
     } catch (error) {
-        res.status(500).json({ error: 'Falha ao processar a lista M3U. Verifique o URL e os logs. Detalhes: ' + error.message });
+        res.status(500).json({ error: 'Falha ao processar a lista M3U. Verifique o conteúdo e os logs. Detalhes: ' + error.message });
     }
 });
 
@@ -119,8 +110,3 @@ process.on('SIGTERM', () => {
     ffmpegProcesses.forEach((_, id) => cleanupProcess(id));
     process.exit(0);
 });
-
-// Adicionar dependência axios
-const packageJson = require('./package.json');
-packageJson.dependencies['axios'] = '^1.6.0';
-fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
